@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>VR Farm View</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+    <!-- Komponen untuk memutar suara saat objek diklik -->
+    <script>
+      AFRAME.registerComponent('play-sound-on-click', {
+        init: function () {
+          this.el.addEventListener('click', () => {
+            const soundEl = document.querySelector('#cluck-sound');
+            if (soundEl && soundEl.components.sound) {
+              soundEl.components.sound.playSound();
+            }
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene background="color: #ECECEC">
+      
+      <!-- Preload semua aset -->
+      <a-assets>
+        <!-- Audio suara domba -->
+        <audio id="bleat" src="Asset/Sound/sheep-122256.ogg" preload="auto"></audio>
+        <!-- Audio suara ayam -->
+        <audio id="cluck-audio" src="Asset/Sound/chicken-cluck.mp3" preload="auto"></audio>
+      </a-assets>
+
+      <!-- Komponen suara ayam (berdiri sendiri) -->
+      <a-entity id="cluck-sound" sound="src: #cluck-audio; volume: 4"></a-entity>
+
+      <!-- Kamera + Kontrol Gerakan + Cursor -->
+      <a-entity id="cameraRig" wasd-controls position="-4 1.6 8" rotation="0 -60 0">
+        <a-entity camera look-controls>
+          <!-- Cursor untuk klik menggunakan mouse -->
+          <a-entity 
+            cursor="fuse: false; rayOrigin: mouse" 
+            raycaster="objects: .clickable"
+            position="0 0 -1"
+            geometry="primitive: ring; radiusInner: 0.01; radiusOuter: 0.015"
+            material="color: black; shader: flat">
+          </a-entity>
+        </a-entity>
+      </a-entity>
+
+      <!-- Pencahayaan -->
+      <a-entity light="type: ambient; color: #BBB"></a-entity>
+      <a-entity light="type: directional; color: #FFF; intensity: 0.5" position="1 1 0"></a-entity>
+
+      <!-- Model Farm -->
+      <a-entity 
+        gltf-model="Asset/farm_-_free_low_poly_game_objects/scene.gltf"
+        position="0 0 0"
+        scale="1 1 1">
+      </a-entity>
+
+      <!-- Model Domba -->
+      <a-entity id="sheep" class="clickable"
+        gltf-model="Asset/sheep_animation_lowpoly/scene.gltf"
+        position="-9.595 0.5 0.128"
+        scale="0.5 0.5 0.5"
+        sound="src: #bleat; on: click; volume: 5"
+        animation__walk="property: position; 
+                         to: -9.3 0.5 0.128; 
+                         dir: alternate; 
+                         dur: 2000; 
+                         easing: easeInOutSine; 
+                         loop: true"
+        animation__graze="property: rotation; 
+                          from: -25 0 0; 
+                          to: 0 0 0; 
+                          dir: alternate; 
+                          dur: 800; 
+                          easing: easeInOutSine; 
+                          loop: true">
+      </a-entity>
+
+      <!-- Model Ayam -->
+      <a-entity id="chicken-wrapper" position="-8.989 0.29 2.893" scale="0.03 0.031 0.03">
+        <a-entity 
+          gltf-model="Asset/cartoon_chicken/scene.gltf"
+          class="clickable"
+          play-sound-on-click
+          rotation="0 90 0"
+          animation__peck="property: rotation;
+                           from: -25 90 0;
+                           to: 0 90 0;
+                           dur: 350;
+                           dir: alternate;
+                           easing: easeInOutSine;
+                           loop: true">
+        </a-entity>
+      </a-entity>
+
+      <!-- Tanah -->
+      <a-plane rotation="-90 0 0" width="20" height="20" color="#7BC8A4"></a-plane>
+
+    </a-scene>
+  </body>
+</html>
